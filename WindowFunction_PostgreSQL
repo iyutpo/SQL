@@ -96,23 +96,32 @@ VALUES
   ('dave', 70, 'Germany'),
   ('eric', 70, 'France');
 
+问题：如何 根据 country列，对 weight列 按行 求平均？
+说明：
+在上面的Runners 表中，我们首先得到 'andy'行，andy的 'country'是'UK'，我们对 包含'andy'行 在内的 所有已有的'UK'行 进行平均，得到 AVG(weight) 为： 50 ÷ 1 = 50 
+然后 'bob' 行也属于'UK'，再次对 'UK' 的 'weight' 列取平均： (50 + 100) ÷ 2 = 75
+接着，'cedric' 行属于 'France' 所以 我们只对包含'cedric'行在内的所有 'France'行 取平均，得到 AVG(weight)为：
+50 ÷ 1 = 50
+......
+最终的结果为（可能最后一列的小数位数会有不同）：
+-------------------------------------------------------------
+|    name   |   weight   |    country    |    avg(weight)   |
+-------------------------------------------------------------
+|    andy   |     50     |      UK       |        50.0      |
+-------------------------------------------------------------
+|    bob    |     100    |      UK       |        75.0      |
+-------------------------------------------------------------
+|   cedric  |     50     |    France     |        50.0      |
+-------------------------------------------------------------
+|    dave   |     70     |    Germany    |        70.0      |
+-------------------------------------------------------------
+|    eric   |     50     |    France     |        60.0      |
+-------------------------------------------------------------
+
+这种问题就可以用 PARTITION BY 来解决：
+SELECT name, weight, country, AVG(weight) OVER (PARTITION BY country ORDER BY name)
+FROM Runners ORDER BY name;
 
 
 
-Partition by allows us to further subdivide the preceding Over Command
 
-Here avg_weight is recomputed on every 'step' of the SQL like above BUT it is reset when the partition by field changes.
-
-In this case we partition by country (think of it as grouping by country). There is a different aggregate function for each country
-
-
-
-
-
-Think of over as like a running total. For instance in our runners table, we have a query that selects name and average weight of all the runners seen so far when ordered by name. Here average_weight is recomputed on each 'step' of the SQL output
-
-select
-name, weight,
-avg(weight) over (order by name)
-from runners order by name
-limit 3
