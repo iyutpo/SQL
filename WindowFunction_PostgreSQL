@@ -1,0 +1,62 @@
+假设现在我们有一个表(Cats):
+
+Cats:
+------------------------------------------------------------------------
+|    name	    |    breed    |    weight  	|    color	   |     age     |
+------------------------------------------------------------------------
+|    ashes	  |   persian   |     4.5     |    black     |      5      |
+------------------------------------------------------------------------
+|    molly	  |   persian   |     4.2     |    black     |      1      |
+------------------------------------------------------------------------
+|    felix	  |   british   |     4.9     | tortoiseshell|      2      |
+------------------------------------------------------------------------
+|    smudge	  |   british   |     4.9     |    black     |      4      |
+------------------------------------------------------------------------
+|    tigger	  |   british   |     3.8     | tortoiseshell|      2      |
+------------------------------------------------------------------------
+|    alfie	  |   siamese   |     5.5     |    brown     |      5      |
+------------------------------------------------------------------------
+|    oscar	  |   siamese   |     6.1     |    black     |      1      |
+------------------------------------------------------------------------
+|    millie	  | maine coon  |     5.4     | tortoiseshell|      5      |
+------------------------------------------------------------------------
+|    puss 	  | maine coon  |     5.7     |    brown     |      2      |
+------------------------------------------------------------------------
+|    smokey	  | maine coon  |     5.1     | tortoiseshell|      2      |
+------------------------------------------------------------------------
+|    charlie  |   british   |     4.8     |    black     |      4      |
+------------------------------------------------------------------------
+
+在PgAdmin4中创建上面的表：
+DROP TABLE IF EXISTS Cats;
+CREATE TABLE Cats
+  (name varchar(20), breed varchar(20), weight float, color varchar(20), age int);
+INSERT INTO Cats
+VALUES
+  ('ashes', 'persian', 4.5, 'black', 5),
+  ('molly', 'persian', 4.2, 'black', 1),
+  ('felix', 'british', 4.9, 'tortoiseshell', 2),
+  ('smudge', 'british', 4.9, 'black', 4),
+  ('tigger', 'british', 3.8, 'tortoiseshell', 2),
+  ('alfie', 'siamese', 5.5, 'brown', 5),
+  ('oscar', 'simaese', 6.1, 'black', 1),
+  ('millie', 'maine coon', 5.4, 'tortoiseshell', 5),
+  ('puss', 'maine coon', 5.7, 'brown', 2),
+  ('smokey', 'maine coon', 5.1, 'tortoiseshell', 2),
+  (charlie', 'british', 4.8, 'black', 4);
+
+
+=====================================================================================================
+Basic Over
+Over 语句 在对aggregate function （如avg，sum，count等）进行限制的时候 非常常用。
+
+
+
+
+Think of over as like a running total. For instance in our runners table, we have a query that selects name and average weight of all the runners seen so far when ordered by name. Here average_weight is recomputed on each 'step' of the SQL output
+
+select
+name, weight,
+avg(weight) over (order by name)
+from runners order by name
+limit 3
