@@ -89,7 +89,7 @@ Runners:
 -- 答案：
 SELECT name, time,
   NTH_VALUE(time, 2) OVER (ORDER BY time) - time AS diff_between_current_and_nth_row,
-  NTH_VALUE(time, 3) OVER (ORDER BY time) AS the_nth_smallest_value,
+  NTH_VALUE(time, 3) OVER (ORDER BY time RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS the_nth_smallest_value,
   NTILE(4) OVER (ORDER BY time) AS which_part
 FROM Runners
 ORDER BY time;
