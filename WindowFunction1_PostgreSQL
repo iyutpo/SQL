@@ -176,12 +176,47 @@ FROM Runners
 ORDER BY weight;
 
 
+-- Follow Up Question 1: 如果 想让 window 为  从当前 行 到 之前所有 行，怎么写？
+说明： 如果当前 行 为 'andy'，则 window 包含的 行 为：'andy'
+如果当前 行 为 'bob'，则 window 包含的 行 为：'andy'和 'bob'
+如果当前 行 为 'cedric'，则 window 包含的 行 为：'andy', 'bob'和 'cedric'
+如果当前 行 为 'dave'，则 window 包含的 行 为：'andy', 'bob', 'cedric'和 'dave'
+如果当前 行 为 'eric'，则 window 包含的 行 为：'andy', 'bob', 'cedric', 'dave'和 'eric'
+
+--答案：
+SELECT name, weight, 
+       MAX(weight) OVER (ORDER BY name ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW),
+       MIN(weight) OVER (ORDER BY name ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
+FROM Runners
+ORDER BY weight;
+
+
+-- Follow Up Question 2: 如果 想让 window 没有前界该怎么写？
+说明： 如果当前 行 为 'andy'，则 window 包含的 行 为：'andy'和 'bob'
+如果当前 行 为 'bob'，则 window 包含的 行 为：'andy', 'bob'和 'cedric'
+如果当前 行 为 'cedric'，则 window 包含的 行 为：'andy', 'bob', 'cedric'和 'dave'
+如果当前 行 为 'dave'，则 window 包含的 行 为：'andy', 'bob', 'cedric', 'dave'和 'eric'
+如果当前 行 为 'eric'，则 window 包含的 行 为：'andy', 'bob', 'cedric', 'dave', 'eric'和 'eric'的下一行（空）
+
+--答案：
+SELECT name, weight, 
+       MAX(weight) OVER (ORDER BY name ROWS BETWEEN UNBOUNDED PRECEDING AND 1 FOLLOWING),
+       MIN(weight) OVER (ORDER BY name ROWS BETWEEN UNBOUNDED PRECEDING AND 1 FOLLOWING)
+FROM Runners
+ORDER BY weight;
+
+
 =====================================================================================================
 ※ 可能你已经注意到了，在 OVER 后面的 括号中 有一个 ORDER BY。在 FROM 语句后还有个 ORDER BY。
 这两个 ORDER BY 有着很大的区别：
 
 回想下，window function 在计算的时候， 是按照 行 的顺序计算的。所以实际上，第一个 ORDER BY 就是在指定 window function 按照 行 计算的时候的 行序。
 而第二个 ORDER BY，就 控制着输出结果 要按照 什么顺序进行输出。
+
+
+
+
+
 
 
 
