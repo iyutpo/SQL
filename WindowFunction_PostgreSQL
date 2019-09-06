@@ -172,7 +172,21 @@ Expected Output：
 SELECT name, weight, 
        MAX(weight) OVER (ORDER BY name ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING),
        MIN(weight) OVER (ORDER BY name ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING)
-FROM Runners;
+FROM Runners
+ORDER BY weight;
+
+
+=====================================================================================================
+※ 可能你已经注意到了，在 OVER 后面的 括号中 有一个 ORDER BY。在 FROM 语句后还有个 ORDER BY。
+这两个 ORDER BY 有着很大的区别：
+
+回想下，window function 在计算的时候， 是按照 行 的顺序计算的。所以实际上，第一个 ORDER BY 就是在指定 window function 按照 行 计算的时候的 行序。
+而第二个 ORDER BY，就 控制着输出结果 要按照 什么顺序进行输出。
+
+
+
+
+
 
 
 
