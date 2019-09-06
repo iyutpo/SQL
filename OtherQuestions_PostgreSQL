@@ -114,7 +114,7 @@ ORDER BY weight, time
 
 =======================================================================================================
 ARRAY_AGG
-这条语句 并不属于 window function，但比较有趣，所以想讲讲。
+这条语句 并不属于 window function，但比较有趣，所以想讲讲。另外严格意义上，ARRAY_AGG 应该属于 aggregate function，所以常与 GROUP BY 一起用。
 ARRAY_AGG 可以帮我们 将若干个 数据 转换成一个 数组（array）。
 
 例如，对于Runners表：
