@@ -1,4 +1,4 @@
-该文件中将讲述 FILTER, ARRAY_AGG 两个语句
+该文件中将讲述 FILTER, WINDOW, 和 ARRAY_AGG 三个语句
 
 来看一个表 Runners：
 Runners:
@@ -49,6 +49,67 @@ SELECT country,
     AVG(time) FILTER (WHERE weight < 90) AS light_runners_time
 FROM Runners
 GROUP BY country;
+
+
+=======================================================================================================
+WINDOW
+这条语句不是很常见，但有的时候很实用。假设有如下一个场景：
+
+Runners:
+-------------------------------------------------------
+|    name   |   weight   |    country    |    time    |
+-------------------------------------------------------
+|    andy   |     50     |      UK       |    101     |
+-------------------------------------------------------
+|    bob    |     100    |      UK       |    103     |
+-------------------------------------------------------
+|   cedric  |     50     |    France     |    104     |
+-------------------------------------------------------
+|    dave   |     70     |    Germany    |    104     |
+-------------------------------------------------------
+|    eric   |     50     |    France     |    108     |
+-------------------------------------------------------
+
+我们想要三列数据，这三列数据 所使用的 语句都是 window function 中的 NTILE(n) 
+（NTILE(n)：将某一列从小到大平均分为 n 份，并返回当前行所属于 第几份。）
+详见：https://github.com/iyutpo/SQL/blob/master/GroupingOutput_PostgreSQL
+
+所以比较直接的方法就是 重复写 3 次 NTILE(n)，即：
+SELECT name, time, 
+NTILE(2) OVER (ORDER BY time ASC) AS by_half,
+NTILE(3) OVER (ORDER BY time ASC) AS thirds,
+NTILE(4) OVER (ORDER BY time ASC) AS quart
+FROM Runners 
+ORDER BY time;
+
+--Expected Output:
+--------------------------------------------------------------
+|    name   |   time   |    by_half   |   third   |   quart  |
+--------------------------------------------------------------
+|    andy   |    101   |       1      |     1     |     1    |
+--------------------------------------------------------------
+|    bob    |    103   |       1      |     1     |     1    |
+--------------------------------------------------------------
+|   cedric  |    104   |       1      |     2     |     2    |
+--------------------------------------------------------------
+|    dave   |    104   |       2      |     2     |     3    |
+--------------------------------------------------------------
+|    eric   |    108   |       2      |     3     |     4    |
+--------------------------------------------------------------
+
+但是如果我们 要调用 NTILE(n) 很多次，并且 OVER 后边括号内的语句很长的话，就会很麻烦。所以这时就可以用 WINDOW 语句：
+
+SELECT name, time, 
+NTILE(2) OVER ntile_window AS by_half, 
+NTILE(3) OVER ntile_window AS thirds, 
+NTILE(4) OVER ntile_window AS quart 
+FROM Runners 
+WHERE time > 0              --这行没有影响输出结果，只是为了说明 WHERE 和 WINDOW 语句的顺序
+WINDOW ntile_window AS (ORDER BY weight) 
+ORDER BY weight, time
+
+(上面的  'ntile_window' 就是用户自己定义的 一个新的 window function 。效果与 写三次 NTILE(n) 是一样的。）
+***!!!（WINDOW 的本质 是 帮助用户 将 多个 OVER() 括号中的 重复的语句 进行打包， 减少代码量）!!!***
 
 
 =======================================================================================================
